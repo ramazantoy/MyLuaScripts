@@ -11,11 +11,19 @@ local coolDownValue=config:WaitForChild("CoolDown");
 
 local canShoot=true;
 
+--Animation
+
+local kickBackAnim=script.Parent:WaitForChild("KickBackAnim");
+local kickBackTrack=nil;
+
+
+
 local function OnActivated()
 	
 	if canShoot then
 		
 		canShoot=false;
+		kickBackTrack:Play();
 		shootRe:FireServer(mouse.Target);
 		wait(coolDownValue.Value);
 		canShoot=true;
@@ -31,6 +39,11 @@ local function OnEquipped()
 	player=game.Players.LocalPlayer;
 	mouse=player:GetMouse();
 	connection=gun.Activated:Connect(OnActivated);
+	local char=player.Character or player.CharacterAdded:Wait();
+	local hum=char:WaitForChild("Humanoid");
+	local animator=hum:WaitForChild("Animator");
+	kickBackTrack=animator:LoadAnimation(kickBackAnim);
+	
 	
 end
 
