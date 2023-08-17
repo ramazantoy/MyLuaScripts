@@ -3,6 +3,28 @@ local dataStoreService=game:GetService("DataStoreService");
 
 local ds=dataStoreService:GetDataStore("MyData");
 
+local function CheckDailyStreak(player)
+	local savedTime=player.playerInfo.SavedTime.Value;
+	local secPerDay=86400; --second for a day
+	local now=os.time();
+	local nowMinus1day=now-secPerDay;
+	local formatedSaveTime=os.date('*t',savedTime);
+	local formatedNowMinus1Day=os.date('*t',nowMinus1day);
+
+
+	if formatedSaveTime.yday == formatedNowMinus1Day.yday  and 
+		formatedSaveTime.year == formatedNowMinus1Day.year then
+		player.playerInfo.Streak.Value+=1;
+	elseif (now-savedTime < secPerDay) then
+
+
+	else
+		player.playerInfo.Streak.Value=1;
+	end
+
+	player.playerInfo.SavedTime.Value=now;
+
+end
 
 local function InitalizePlayerData(player)
 	local data=nil;
@@ -14,7 +36,7 @@ local function InitalizePlayerData(player)
 
 	if not succes then
 
-		player:FindFirstChild("playerinfo") ["Bad Data"].Value=true;
+		player.playerInfo["Bad Data"].Value=true;
 		player:Kick("Datastore unreachable, pls try again ", msg);
 
 	end
@@ -24,8 +46,19 @@ local function InitalizePlayerData(player)
 		leaderStats.Points.Value=data.Points;
 		leaderStats.Kills.Value=data.Kills;
 		leaderStats.Deaths.Value=data.Deaths;
+		if not data.Streak then
+			--brand new user
+			player.playerInfo.Streak.Value=1;
+			player.playerInfo.SavedTime.Value=os.time();
+		else
+			player.playerInfo.Streak.Value=data.Streak;
+			player.playerInfo.SavedTime.Value=data.SavedTime;
+			CheckDailyStreak(player);
+		end
+
+
 	else
-		data={Points=0,Deaths=0,Kills=0};
+		data={Points=0,Deaths=0,Kills=0,Streak=1,SaveTime=os.time()};
 		--print("The First Time Player");
 		-- maybe do remove event welcome screen
 
@@ -36,17 +69,21 @@ local function InitalizePlayerData(player)
 
 end
 
+
 local function SavePlayerData(player)
 	local data = {}
-	local leaderStats = player:FindFirstChild("leaderstats")
+	local leaderStats = player.leaderstats;
 	data.Points = leaderStats.Points.Value
 	data.Kills = leaderStats.Kills.Value
 	data.Deaths = leaderStats.Deaths.Value
-	
-	
+
+	CheckDailyStreak(player);
+	data.SavedTime=player.playerInfo.SavedTime.Value;
+	data.Streak=player.playerInfo.Streak.Value;
+
 
 	if not player.playerInfo["Bad Data"].Value then
-		
+
 		ds:SetAsync(player.UserId,data);
 	else
 
@@ -55,7 +92,7 @@ end
 
 local function SaveLoop()
 
-	while wait(5) do
+	while wait(10) do
 		local players=game.Players:GetChildren();
 		for i,player in pairs(players) do
 			local board=player:FindFirstChild("leaderstats");
@@ -89,7 +126,16 @@ local function addBoard(player)
 	local badData = Instance.new("BoolValue", playerInfo)
 	badData.Name = "Bad Data"
 	badData.Value = false
+
+	--daily event
+	local savedTime=Instance.new("NumberValue",playerInfo);
+	savedTime.Name="SavedTime";
+
+	local streak=Instance.new("IntValue",playerInfo);
+	streak.Name="Streak";
 end
+
+
 
 local function ExcludeAccessory(part)
 	if part:IsA("Accessory") then
