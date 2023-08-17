@@ -7,17 +7,18 @@ local ds=dataStoreService:GetDataStore("MyData");
 local function InitalizePlayerData(player)
 	local data=nil;
 	local succes,msg=pcall(function()
-		
+
 		data=ds:GetAsync(player.UserId);
-		
+
 	end)
-	
+
 	if not succes then
-		
+
+		player:FindFirstChild("playerinfo") ["Bad Data"].Value=true;
 		player:Kick("Datastore unreachable, pls try again ", msg);
-		
+
 	end
-	
+
 	if data then
 		local leaderStats=player:FindFirstChild("leaderstats");
 		leaderStats.Points.Value=data.Points;
@@ -27,69 +28,77 @@ local function InitalizePlayerData(player)
 		data={Points=0,Deaths=0,Kills=0};
 		--print("The First Time Player");
 		-- maybe do remove event welcome screen
-		
+
 	end
 	ds:SetAsync(player.UserId,data);
 	-- data is false for clear data
-	
-	
+
+
 end
 
 local function SavePlayerData(player)
-	
-	local data={};
-	local leaderStats=player:FindFirstChild("leaderstats");
-	data.Points=leaderStats.Points.Value;
-	data.Kills=leaderStats.Kills.Value;
-	data.Deaths=leaderStats.Deaths.Value
-	ds:SetAsync(player.UserId,data);
+	local data = {}
+	local leaderStats = player:FindFirstChild("leaderstats")
+	data.Points = leaderStats.Points.Value
+	data.Kills = leaderStats.Kills.Value
+	data.Deaths = leaderStats.Deaths.Value
 	
 	
+
+	if not player.playerInfo["Bad Data"].Value then
+		
+		ds:SetAsync(player.UserId,data);
+	else
+
+	end
 end
 
 local function SaveLoop()
-	
+
 	while wait(5) do
 		local players=game.Players:GetChildren();
 		for i,player in pairs(players) do
 			local board=player:FindFirstChild("leaderstats");
-			
+
 			if board then
 				SavePlayerData(player);
-				print("Save loop",player.Name);
+				--print("Save loop",player.Name);
 				wait();
 			end
 		end
 	end
 end
-	
+
 
 local function addBoard(player)
-	
-	local board=Instance.new("Folder",player);
-	board.Name="leaderstats";
-	local points=Instance.new("IntValue",board);
-	points.Name="Points";
-	
-	local kills=Instance.new("IntValue",board)
-	kills.Name="Kills";
-	
+	local board = Instance.new("Folder", player)
+	board.Name = "leaderstats"
 
-	local deaths=Instance.new("IntValue",board)
-	deaths.Name="Deaths";
-	
-	
-	
+	local points = Instance.new("IntValue", board)
+	points.Name = "Points"
+
+	local kills = Instance.new("IntValue", board)
+	kills.Name = "Kills"
+
+	local deaths = Instance.new("IntValue", board)
+	deaths.Name = "Deaths"
+
+	local playerInfo = Instance.new("Folder", player)
+	playerInfo.Name = "playerInfo"
+
+	local badData = Instance.new("BoolValue", playerInfo)
+	badData.Name = "Bad Data"
+	badData.Value = false
 end
 
 local function ExcludeAccessory(part)
 	if part:IsA("Accessory") then
 		for i, v in pairs(part:GetChildren()) do
 			if v:IsA("BasePart") then
-				
+
 				v.CanCollide = false
 				v.CanQuery = false
-				
+
 			end
 		end
 	end
@@ -115,10 +124,10 @@ game.Players.PlayerAdded:Connect(function(player)
 					end
 				end
 			end
-			
+
 			if player:FindFirstChild("leaderstats") then
 				local deathsStat = player.leaderstats:FindFirstChild("Deaths")
-	
+
 				if deathsStat then
 					deathsStat.Value += 1
 				end
@@ -126,13 +135,13 @@ game.Players.PlayerAdded:Connect(function(player)
 		end)
 	end)
 	player.CharacterAppearanceLoaded:Connect(function(char)
-		
+
 		for i,v in pairs(char:GetChildren()) do
-			
+
 			ExcludeAccessory(v);
 		end
 		char.DescendantAdded:Connect(function(part)
-			
+
 			ExcludeAccessory(part);
 		end)
 	end)
