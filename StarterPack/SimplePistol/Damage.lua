@@ -32,12 +32,16 @@ local coolDownValue=config:WaitForChild("CoolDown");
 
 local canShoot=true;
 
+--particle
+local flash=script.Parent.GunPart.FlashAtt.Flash;
+
 local function OnShoot(player,target)
 	
 	if canShoot then
 		
 		canShoot=false;
 		bang:Play();
+		flash:Emit(1);
 
 		if(target ~= nil  and target.Parent) then
 			local hum=target.Parent:FindFirstChild("Humanoid");
