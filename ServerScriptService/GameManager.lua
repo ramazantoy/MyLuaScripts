@@ -18,6 +18,19 @@ end
 
 --game.Players.PlayerAdded:Connect(addBoard);
 
+local function ExcludeAccessory(part)
+	if part:IsA("Accessory") then
+		for i, v in pairs(part:GetChildren()) do
+			if v:IsA("BasePart") then
+				
+				v.CanCollide = false
+				v.CanQuery = false
+				
+			end
+		end
+	end
+end
+
 game.Players.PlayerAdded:Connect(function(player)
 	addBoard(player)
 	player.CharacterAdded:Connect(function(char)
@@ -45,6 +58,17 @@ game.Players.PlayerAdded:Connect(function(player)
 					deathsStat.Value += 1
 				end
 			end
+		end)
+	end)
+	player.CharacterAppearanceLoaded:Connect(function(char)
+		
+		for i,v in pairs(char:GetChildren()) do
+			
+			ExcludeAccessory(v);
+		end
+		char.DescendantAdded:Connect(function(part)
+			
+			ExcludeAccessory(part);
 		end)
 	end)
 end)
