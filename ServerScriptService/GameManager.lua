@@ -3,6 +3,40 @@ local dataStoreService=game:GetService("DataStoreService");
 
 local ds=dataStoreService:GetDataStore("MyData");
 
+local rs=game:GetService("ReplicatedStorage");
+
+local infoMsgRE=rs:WaitForChild("InfoMessageRe");
+
+
+local function addBoard(player)
+	local board = Instance.new("Folder", player)
+	board.Name = "leaderstats"
+
+	local points = Instance.new("IntValue", board)
+	points.Name = "Points"
+
+	local kills = Instance.new("IntValue", board)
+	kills.Name = "Kills"
+
+	local deaths = Instance.new("IntValue", board)
+	deaths.Name = "Deaths"
+
+	local playerInfo = Instance.new("Folder", player)
+	playerInfo.Name = "playerInfo"
+
+	local badData = Instance.new("BoolValue", playerInfo)
+	badData.Name = "Bad Data"
+	badData.Value = false
+
+	--daily event
+	local savedTime=Instance.new("NumberValue",playerInfo);
+	savedTime.Name="SavedTime";
+
+	local streak=Instance.new("IntValue",playerInfo);
+	streak.Name="Streak";
+end
+
+
 local function CheckDailyStreak(player)
 	local savedTime=player.playerInfo.SavedTime.Value;
 	local secPerDay=86400; --second for a day
@@ -15,11 +49,20 @@ local function CheckDailyStreak(player)
 	if formatedSaveTime.yday == formatedNowMinus1Day.yday  and 
 		formatedSaveTime.year == formatedNowMinus1Day.year then
 		player.playerInfo.Streak.Value+=1;
+		infoMsgRE:FireClient(player,"You  increast your streak!".. player.playerInfo.Streak.Value);
+		infoMsgRE:FireClient(player,"You get 100 points.");
+		infoMsgRE:FireClient(player,"You get a daily reward!.");
+		infoMsgRE:FireClient(player,"You get 50 points.");
+		player.leaderstats.Points.Value+=150;
 	elseif (now-savedTime < secPerDay) then
 
 
 	else
 		player.playerInfo.Streak.Value=1;
+		infoMsgRE:FireClient(player,"You broke your streak.");
+		infoMsgRE:FireClient(player,"You get a daily reward!.");
+		infoMsgRE:FireClient(player,"You get 50 points.");
+		player.leaderstats.Points.Value+=50;
 	end
 
 	player.playerInfo.SavedTime.Value=now;
@@ -107,33 +150,6 @@ local function SaveLoop()
 end
 
 
-local function addBoard(player)
-	local board = Instance.new("Folder", player)
-	board.Name = "leaderstats"
-
-	local points = Instance.new("IntValue", board)
-	points.Name = "Points"
-
-	local kills = Instance.new("IntValue", board)
-	kills.Name = "Kills"
-
-	local deaths = Instance.new("IntValue", board)
-	deaths.Name = "Deaths"
-
-	local playerInfo = Instance.new("Folder", player)
-	playerInfo.Name = "playerInfo"
-
-	local badData = Instance.new("BoolValue", playerInfo)
-	badData.Name = "Bad Data"
-	badData.Value = false
-
-	--daily event
-	local savedTime=Instance.new("NumberValue",playerInfo);
-	savedTime.Name="SavedTime";
-
-	local streak=Instance.new("IntValue",playerInfo);
-	streak.Name="Streak";
-end
 
 
 
