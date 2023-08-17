@@ -20,7 +20,7 @@ local function InitalizePlayerData(player)
 	end
 
 	if data then
-		local leaderStats=player:FindFirstChild("leaderstats");
+		local leaderStats=player.leaderstats;
 		leaderStats.Points.Value=data.Points;
 		leaderStats.Kills.Value=data.Kills;
 		leaderStats.Deaths.Value=data.Deaths;
@@ -115,8 +115,8 @@ game.Players.PlayerAdded:Connect(function(player)
 			if tag and tag.Value then
 				local ePlayer=tag.Value;
 				if ePlayer:FindFirstChild("leaderstats") then
-					local killsStat = ePlayer.leaderstats:FindFirstChild("Kills")
-					local pointsStat = ePlayer.leaderstats:FindFirstChild("Points")
+					local killsStat = ePlayer.leaderstats["Kills"];
+					local pointsStat = ePlayer.leaderstats["Deaths"];
 
 					if killsStat and pointsStat then
 						killsStat.Value += 1
@@ -125,8 +125,8 @@ game.Players.PlayerAdded:Connect(function(player)
 				end
 			end
 
-			if player:FindFirstChild("leaderstats") then
-				local deathsStat = player.leaderstats:FindFirstChild("Deaths")
+			if player.leaderstats then
+				local deathsStat = player.leaderstats["Deaths"];
 
 				if deathsStat then
 					deathsStat.Value += 1
