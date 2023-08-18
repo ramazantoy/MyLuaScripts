@@ -15,7 +15,7 @@ function equipUtils:addItemToPlayersInventory(player,itemInfoTbl)
 		equipmentTbl[player]={}
 	end
 	table.insert(equipmentTbl[player],itemInfoTbl);
-	print("equipment table = ",equipmentTbl);
+	--print("equipment table = ",equipmentTbl);
 end
 
 --called when players enter the game

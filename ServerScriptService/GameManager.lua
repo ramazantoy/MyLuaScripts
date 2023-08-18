@@ -72,6 +72,7 @@ local function CheckDailyStreak(player)
 end
 
 local function InitalizePlayerData(player)
+	--ds:SetAsync(player.UserId,false); -- to reset player data
 	local data=nil;
 	local succes,msg=pcall(function()
 
@@ -87,6 +88,7 @@ local function InitalizePlayerData(player)
 	end
 
 	if data then
+		
 		local leaderStats=player.leaderstats;
 		leaderStats.Points.Value=data.Points;
 		leaderStats.Kills.Value=data.Kills;
@@ -98,6 +100,7 @@ local function InitalizePlayerData(player)
 		else
 			player.playerInfo.Streak.Value=data.Streak;
 			player.playerInfo.SavedTime.Value=data.SavedTime;
+			infoMsgRE:FireClient(player,"Welcome again!.");
 			CheckDailyStreak(player);
 		end
 		if data.equipment then
@@ -109,8 +112,12 @@ local function InitalizePlayerData(player)
 		data={Points=0,Deaths=0,Kills=0,Streak=1,SaveTime=os.time()};
 		--print("The First Time Player");
 		-- maybe do remove event welcome screen
+		player.playerInfo.Streak.Value=data.Streak;
+		player.playerInfo.SavedTime.Value=data.SavedTime;
+		infoMsgRE:FireClient(player,"Welcome new player!.");
 
 	end
+	CheckDailyStreak(player);
 	ds:SetAsync(player.UserId,data);
 	-- data is false for clear data
 
@@ -174,9 +181,8 @@ local function ExcludeAccessory(part)
 end
 
 game.Players.PlayerAdded:Connect(function(player)
-	addBoard(player)
-	InitalizePlayerData(player)
-	equipUtils:equipPlayer(player);
+	
+	
 	player.CharacterAdded:Connect(function(char)
 		equipUtils:equipPlayer(player);
 		local hum=char:WaitForChild("Humanoid");
@@ -216,9 +222,13 @@ game.Players.PlayerAdded:Connect(function(player)
 			ExcludeAccessory(part);
 		end)
 	end)
+	addBoard(player);
+	InitalizePlayerData(player)
+	spawn(SaveLoop); 
+	equipUtils:equipPlayer(player);
 end)
 
-spawn(SaveLoop); -- spawn thread for save loop;
+-- spawn thread for save loop;
 
 game.Players.PlayerRemoving:Connect(function(player)
 	SavePlayerData(player);
