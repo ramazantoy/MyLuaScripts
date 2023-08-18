@@ -11,6 +11,11 @@ local equipmentTbl={};
 
 function equipUtils:addItemToPlayersInventory(player,itemInfoTbl)
 	
+	if not equipmentTbl[player] then
+		equipmentTbl[player]={}
+	end
+	table.insert(equipmentTbl[player],itemInfoTbl);
+	print("equipment table = ",equipmentTbl);
 end
 
 --called when players enter the game
