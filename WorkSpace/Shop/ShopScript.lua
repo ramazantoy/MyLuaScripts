@@ -25,11 +25,23 @@ local player=game:GetService("Players").LocalPlayer;
 local buyBtn=shopFrm.ToBuyFrm.BuyBtn;
 
 
+
+local msgLbl=shopFrm.TopBarFrm.MsgLbl;
+
+
 local function previewItem(btn)
 
 	previewImg.Image=btn.ImageId.Value;
 	previewName.Text=btn.ItemName.Value;
 	previewPrice.Text=btn.Price.Value;
+
+end
+local function clearFields()
+
+	previewImg.Image='';
+	previewName.Text='';
+	previewPrice.Text='';
+	msgLbl.Text='';
 
 end
 
@@ -47,10 +59,26 @@ for i,v in pairs(itemsFrame:GetChildren()) do
 	end
 end
 
+local function isOwned(player,item)
+
+	local char=player.Character or player.CharacterAdded:Wait();
+	local ownedItem=char:FindFirstChild(item);
+	if ownedItem then
+		msgLbl.Text="Found the item! It was equipped!"
+		return true;
+	end
+	ownedItem=player.Backpack:FindFirstChild(item);
+	if ownedItem then
+		msgLbl.Text="Found the item! It was on Backpack!"
+		return true;
+	end
+end
+
 
 shopRe.OnClientEvent:Connect(function()
 
 	shopFrm.Visible=true;
+	clearFields();
 	ding:Play();
 end);
 
@@ -62,14 +90,23 @@ end)
 buyBtn.Activated:Connect(function()
 
 	if previewName.Text ~='' then -- nothing selected
-		
-		print("buying ....",previewName.Text);
-		if(player.leaderstats.Points.Value >= tonumber(previewPrice.Text)) then
-			shopRe:FireServer(previewName.Text,previewPrice.Text);
-		else
-			print("Not enough money");
 
+		if not isOwned(player,previewName.Text) then
+			
+			
+			if(player.leaderstats.Points.Value >= tonumber(previewPrice.Text)) then
+				
+				shopRe:FireServer(previewName.Text,previewPrice.Text);
+				clearFields();
+				shopFrm.Visible=false;
+				
+			else
+				
+				msgLbl.Text="Not enough money!";
+				
+				
+			end
 		end
-
-	end
+	end 
+	--something was selected
 end)
