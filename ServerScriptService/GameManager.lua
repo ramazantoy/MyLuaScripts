@@ -7,6 +7,8 @@ local rs=game:GetService("ReplicatedStorage");
 
 local infoMsgRE=rs:WaitForChild("InfoMessageRe");
 
+local equipUtils=require(game.ServerScriptService.EquipStorageUtils);
+
 
 local function addBoard(player)
 	local board = Instance.new("Folder", player)
@@ -98,6 +100,9 @@ local function InitalizePlayerData(player)
 			player.playerInfo.SavedTime.Value=data.SavedTime;
 			CheckDailyStreak(player);
 		end
+		if data.equipment then
+			equipUtils:updatePlayerWithDbInfo(player,data.equipment)
+		end
 
 
 	else
@@ -123,7 +128,9 @@ local function SavePlayerData(player)
 	CheckDailyStreak(player);
 	data.SavedTime=player.playerInfo.SavedTime.Value;
 	data.Streak=player.playerInfo.Streak.Value;
-
+	
+	data.equipment=equipUtils:getPlayerItemsToSave(player);
+	
 
 	if not player.playerInfo["Bad Data"].Value then
 
@@ -169,7 +176,9 @@ end
 game.Players.PlayerAdded:Connect(function(player)
 	addBoard(player)
 	InitalizePlayerData(player)
+	equipUtils:equipPlayer(player);
 	player.CharacterAdded:Connect(function(char)
+		equipUtils:equipPlayer(player);
 		local hum=char:WaitForChild("Humanoid");
 		hum.Died:Connect(function()
 			hum:UnequipTools();
@@ -211,5 +220,9 @@ end)
 
 spawn(SaveLoop); -- spawn thread for save loop;
 
-game.Players.PlayerRemoving:Connect(SavePlayerData); -- on leave saving;
+game.Players.PlayerRemoving:Connect(function(player)
+	SavePlayerData(player);
+	equipUtils:removePlayer(player);
+	
+	end); -- on leave saving;
 
