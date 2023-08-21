@@ -8,6 +8,19 @@ local rnd=Random.new(tick());
 local zombieFolder=workspace.Zombies;
 
 
+--Spawn Kicker
+
+function utils:SpawnKickerNpc(npc)
+		local npcInWorld=workspace:FindFirstChild(npc);
+
+		if not npcInWorld then
+			local newNpc=serverStore:WaitForChild("KickAi"):Clone();
+			newNpc.Parent=workspace;
+
+		end
+end
+
+
 function utils:SpawnZombies(numberOfZombies)
 
 	local tZom=serverStore:WaitForChild("Drooling Zombie");

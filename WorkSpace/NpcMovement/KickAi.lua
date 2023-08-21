@@ -18,8 +18,23 @@ local tolForKick=3;-- 5 studs away
 
 local kickDamage=30;
 
+local colletionService=game:GetService("CollectionService");
 
 
+aiHum.Died:Connect(function()
+	
+	game.Debris:AddItem(aiNpc,2);
+end)
+
+aiHum.HealthChanged:Connect(function()
+	local creatorTag=aiHum:FindFirstChild("creator");
+	if creatorTag then
+		local player=creatorTag.Value;
+		local char=player.Character or player.CharacterAdded:Wait();
+		colletionService:AddTag(char,"Targets");
+	end
+		 
+end)
 
 
 local function FindNearestChars(aiNpc,distanceOfInt)--distrance of interest
@@ -27,7 +42,11 @@ local function FindNearestChars(aiNpc,distanceOfInt)--distrance of interest
 	local closestHrp=nil;
 	local aiNpcHrp=aiNpc.HumanoidRootPart;
 	
-	for i,v in pairs(workspace:GetChildren()) do
+	local targets=colletionService:GetTagged("Targets");
+	
+	--print("targets = " , targets)
+	
+	for i,v in pairs(targets) do
 		
 		local humanoidRootPart=v:FindFirstChild("HumanoidRootPart");--hrp always first child
 		
