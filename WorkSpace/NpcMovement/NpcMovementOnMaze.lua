@@ -43,6 +43,15 @@ humanoidObj.MoveToFinished:Connect(function(reached)
 	
 end)
 
+path.Blocked:Connect(function(wayPoint)
+	
+	if wayPoint > wayPointIndex then
+		
+		FallowThePath(targetObject);
+	end
+
+end)
+
 wait(5);
 
 FallowThePath(targetObject);
